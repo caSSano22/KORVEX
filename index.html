@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="virtual-protocol-site-verification" content="125f118121d33ee208b99dacda71a938" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Korvex — $KVX | Onchain Intelligence for Robinhood Chain</title>
+<link rel="icon" href="korvex-logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --void:#050b06;
+    --panel:#0a1a0e;
+    --panel-2:#0e2413;
+    --line:#1c3d22;
+    --lime:#a6ff3e;
+    --lime-dim:#6fd12b;
+    --acid-yellow:#d4ff6a;
+    --ghost:#7fa885;
+    --white:#eafbe9;
+    --danger:#ff5f5f;
+    --radius:2px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--void);
+    color:var(--white);
+    font-family:'IBM Plex Mono', monospace;
+    overflow-x:hidden;
+    position:relative;
+  }
+  ::selection{background:var(--lime);color:#050b06;}
+
+  h1,h2,h3,.display{
+    font-family:'Chakra Petch', sans-serif;
+    text-transform:uppercase;
+    letter-spacing:0.02em;
+  }
+
+  a{color:inherit;text-decoration:none;}
+
+  /* ---------- background grid + scanlines ---------- */
+  .bg-grid{
+    position:fixed;inset:0;
+    background-image:
+      linear-gradient(rgba(166,255,62,0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(166,255,62,0.045) 1px, transparent 1px);
+    background-size:42px 42px;
+    pointer-events:none;
+    z-index:0;
+    mask-image:radial-gradient(ellipse 90% 60% at 50% 0%, black 40%, transparent 90%);
+  }
+  .bg-vignette{
+    position:fixed;inset:0;
+    background:radial-gradient(ellipse 80% 50% at 50% -10%, rgba(166,255,62,0.09), transparent 60%),
+               radial-gradient(ellipse 60% 40% at 100% 100%, rgba(166,255,62,0.05), transparent 60%);
+    pointer-events:none;
+    z-index:0;
+  }
+
+  .wrap{max-width:1180px;margin:0 auto;padding:0 28px;position:relative;z-index:2;}
+
+  /* ---------- nav ---------- */
+  header{
+    position:fixed;top:0;left:0;right:0;z-index:100;
+    backdrop-filter:blur(10px);
+    background:rgba(5,11,6,0.72);
+    border-bottom:1px solid var(--line);
+  }
+  nav{
+    max-width:1180px;margin:0 auto;padding:16px 28px;
+    display:flex;align-items:center;justify-content:space-between;
+  }
+  .brand{display:flex;align-items:center;gap:10px;}
+  .brand img{width:34px;height:34px;filter:drop-shadow(0 0 8px rgba(166,255,62,0.5));}
+  .brand span{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:18px;letter-spacing:0.08em;}
+  .brand .tick{color:var(--lime-dim);font-size:12px;font-weight:500;margin-left:2px;}
+
+  .nav-links{display:flex;gap:34px;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:var(--ghost);}
+  .nav-links a{transition:color .2s;position:relative;}
+  .nav-links a:hover{color:var(--lime);}
+
+  .nav-cta{
+    border:1px solid var(--lime-dim);
+    color:var(--lime);
+    padding:9px 18px;
+    font-size:12px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    background:rgba(166,255,62,0.06);
+    transition:all .2s;
+    white-space:nowrap;
+  }
+  .nav-cta:hover{background:var(--lime);color:#050b06;box-shadow:0 0 22px rgba(166,255,62,0.45);}
+
+  .menu-toggle{display:none;}
+
+  /* ---------- hero ---------- */
+  .hero{
+    position:relative;
+    padding:168px 0 100px;
+    display:flex;
+    align-items:center;
+    gap:60px;
+    min-height:92vh;
+  }
+  .hero-copy{flex:1.15;}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    font-size:11px;letter-spacing:0.2em;color:var(--lime-dim);
+    border:1px solid var(--line);padding:6px 12px;
+    margin-bottom:26px;
+    background:rgba(166,255,62,0.03);
+  }
+  .eyebrow .dot{width:6px;height:6px;background:var(--lime);border-radius:50%;box-shadow:0 0 8px var(--lime);animation:blink 1.6s infinite;}
+  @keyframes blink{0%,100%{opacity:1;}50%{opacity:.25;}}
+
+  .hero h1{
+    font-size:clamp(42px, 6vw, 78px);
+    line-height:0.98;
+    font-weight:700;
+    margin-bottom:24px;
+  }
+  .hero h1 .accent{color:var(--lime);text-shadow:0 0 30px rgba(166,255,62,0.4);}
+
+  .hero-sub{
+    font-size:15px;
+    color:var(--ghost);
+    max-width:520px;
+    line-height:1.75;
+    margin-bottom:14px;
+  }
+  .hero-tag{
+    font-family:'Chakra Petch',sans-serif;
+    font-style:italic;
+    font-size:16px;
+    color:var(--acid-yellow);
+    margin-bottom:36px;
+    opacity:0.9;
+  }
+
+  .hero-ctas{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:48px;}
+  .btn-primary{
+    background:var(--lime);
+    color:#050b06;
+    padding:15px 30px;
+    font-family:'Chakra Petch',sans-serif;
+    font-weight:600;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    font-size:13px;
+    border:1px solid var(--lime);
+    transition:all .2s;
+    cursor:pointer;
+  }
+  .btn-primary:hover{box-shadow:0 0 30px rgba(166,255,62,0.55);transform:translateY(-1px);}
+  .btn-secondary{
+    padding:15px 30px;
+    font-family:'Chakra Petch',sans-serif;
+    font-weight:600;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    font-size:13px;
+    border:1px solid var(--line);
+    color:var(--white);
+    transition:all .2s;
+  }
+  .btn-secondary:hover{border-color:var(--lime-dim);color:var(--lime);}
+
+  .hero-stats{display:flex;gap:36px;}
+  .hero-stats div{border-left:1px solid var(--line);padding-left:14px;}
+  .hero-stats .num{font-family:'Chakra Petch',sans-serif;font-size:22px;font-weight:700;color:var(--lime);}
+  .hero-stats .lbl{font-size:10px;color:var(--ghost);letter-spacing:0.12em;text-transform:uppercase;margin-top:2px;}
+
+  .hero-art{
+    flex:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+  }
+  .hero-art .ring{
+    position:absolute;
+    border:1px solid var(--line);
+    border-radius:50%;
+    animation:spin 40s linear infinite;
+  }
+  .hero-art .ring.r1{width:400px;height:400px;}
+  .hero-art .ring.r2{width:480px;height:480px;border-style:dashed;animation-duration:60s;animation-direction:reverse;}
+  @keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+  .hero-art img{
+    width:340px;
+    max-width:82%;
+    filter:drop-shadow(0 0 50px rgba(166,255,62,0.35));
+    position:relative;
+    z-index:2;
+    animation:float 5s ease-in-out infinite;
+  }
+  @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-14px);}}
+
+  /* ---------- marquee ---------- */
+  .marquee{
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+    padding:16px 0;
+    overflow:hidden;
+    white-space:nowrap;
+    background:var(--panel);
+    position:relative;
+    z-index:2;
+  }
+  .marquee-track{display:inline-block;animation:scroll 26s linear infinite;}
+  .marquee span{
+    font-family:'Chakra Petch',sans-serif;
+    font-size:13px;letter-spacing:0.18em;text-transform:uppercase;
+    color:var(--ghost);
+    padding:0 28px;
+  }
+  .marquee span.hi{color:var(--lime);}
+  @keyframes scroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+  /* ---------- section shared ---------- */
+  section{padding:120px 0;position:relative;z-index:2;}
+  .section-head{max-width:640px;margin-bottom:64px;}
+  .section-eyebrow{
+    font-size:11px;letter-spacing:0.2em;color:var(--lime-dim);
+    margin-bottom:16px;display:block;
+  }
+  .section-head h2{font-size:clamp(30px,4vw,44px);line-height:1.08;margin-bottom:18px;}
+  .section-head p{color:var(--ghost);font-size:14.5px;line-height:1.75;}
+
+  /* ---------- features ---------- */
+  .feat-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:1px;
+    background:var(--line);
+    border:1px solid var(--line);
+  }
+  .feat-card{
+    background:var(--panel);
+    padding:40px;
+    transition:background .25s;
+  }
+  .feat-card:hover{background:var(--panel-2);}
+  .feat-num{font-family:'Chakra Petch',sans-serif;font-size:11px;color:var(--ghost);letter-spacing:0.15em;margin-bottom:22px;}
+  .feat-card h3{font-size:19px;margin-bottom:12px;font-weight:600;}
+  .feat-card p{font-size:13.5px;color:var(--ghost);line-height:1.7;}
+  .feat-icon{width:36px;height:36px;margin-bottom:20px;color:var(--lime);}
+
+  /* ---------- process ---------- */
+  .process{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:24px;
+  }
+  .proc-step{position:relative;padding-top:30px;border-top:1px solid var(--line);}
+  .proc-step .n{
+    font-family:'Chakra Petch',sans-serif;
+    font-size:34px;font-weight:700;
+    color:transparent;
+    -webkit-text-stroke:1px var(--lime-dim);
+    margin-bottom:18px;
+    display:block;
+  }
+  .proc-step h3{font-size:15.5px;margin-bottom:10px;font-weight:600;letter-spacing:0.02em;}
+  .proc-step p{font-size:13px;color:var(--ghost);line-height:1.7;}
+
+  /* ---------- token panel ---------- */
+  .token-panel{
+    border:1px solid var(--line);
+    background:linear-gradient(160deg, var(--panel), var(--panel-2));
+    padding:56px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:56px;
+    position:relative;
+    overflow:hidden;
+  }
+  .token-panel::before{
+    content:"";
+    position:absolute;top:-40%;right:-20%;
+    width:500px;height:500px;
+    background:radial-gradient(circle, rgba(166,255,62,0.10), transparent 65%);
+    pointer-events:none;
+  }
+  .token-left h3{font-size:14px;color:var(--lime-dim);letter-spacing:0.15em;margin-bottom:22px;}
+  .token-row{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:16px 0;
+    border-bottom:1px solid var(--line);
+    font-size:13.5px;
+  }
+  .token-row:last-child{border-bottom:none;}
+  .token-row .k{color:var(--ghost);letter-spacing:0.05em;}
+  .token-row .v{font-family:'Chakra Petch',sans-serif;font-weight:600;color:var(--white);}
+  .token-row .v.lime{color:var(--lime);}
+
+  .token-right{display:flex;flex-direction:column;justify-content:center;}
+  .token-right h3{font-size:22px;line-height:1.35;margin-bottom:18px;}
+  .token-right p{font-size:13.5px;color:var(--ghost);line-height:1.75;margin-bottom:28px;}
+
+  .copy-box{
+    display:flex;align-items:center;justify-content:space-between;
+    border:1px solid var(--line);
+    background:rgba(0,0,0,0.3);
+    padding:14px 16px;
+    font-size:12.5px;
+    color:var(--ghost);
+    margin-bottom:24px;
+  }
+  .copy-box button{
+    background:none;border:1px solid var(--line-dim,var(--line));
+    color:var(--lime);
+    font-size:11px;
+    padding:6px 12px;
+    letter-spacing:0.1em;
+    cursor:pointer;
+    font-family:'Chakra Petch',sans-serif;
+  }
+
+  /* ---------- radar / signature ---------- */
+  .signature{
+    display:flex;
+    align-items:center;
+    gap:64px;
+  }
+  .radar-box{
+    flex:0 0 340px;
+    height:340px;
+    position:relative;
+    border:1px solid var(--line);
+    border-radius:50%;
+  }
+  .radar-box .sweep{
+    position:absolute;inset:0;
+    border-radius:50%;
+    background:conic-gradient(from 0deg, rgba(166,255,62,0.35), transparent 40%);
+    animation:sweep 4s linear infinite;
+  }
+  @keyframes sweep{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+  .radar-box .ring{position:absolute;border:1px solid var(--line);border-radius:50%;}
+  .radar-box .ring.r1{inset:20%;}
+  .radar-box .ring.r2{inset:40%;}
+  .radar-box .ring.r3{inset:60%;}
+  .radar-box .blip{
+    position:absolute;width:6px;height:6px;background:var(--lime);border-radius:50%;
+    box-shadow:0 0 10px var(--lime);
+  }
+  .radar-box .core{
+    position:absolute;top:50%;left:50%;width:8px;height:8px;
+    background:var(--white);border-radius:50%;
+    transform:translate(-50%,-50%);
+    box-shadow:0 0 14px var(--lime);
+  }
+  .signature-copy{flex:1;}
+  .signature-copy p{color:var(--ghost);font-size:14.5px;line-height:1.8;margin-bottom:16px;}
+
+  /* ---------- CTA band ---------- */
+  .cta-band{
+    border:1px solid var(--line);
+    padding:70px 56px;
+    text-align:center;
+    background:radial-gradient(ellipse 70% 100% at 50% 0%, rgba(166,255,62,0.08), transparent 70%);
+  }
+  .cta-band h2{font-size:clamp(28px,4vw,42px);margin-bottom:16px;}
+  .cta-band p{color:var(--ghost);font-size:14px;margin-bottom:36px;}
+  .cta-band .hero-ctas{justify-content:center;margin-bottom:0;}
+
+  /* ---------- footer ---------- */
+  footer{border-top:1px solid var(--line);padding:56px 0 32px;position:relative;z-index:2;}
+  .foot-top{display:flex;justify-content:space-between;flex-wrap:wrap;gap:40px;margin-bottom:48px;}
+  .foot-brand .brand{margin-bottom:14px;}
+  .foot-brand p{font-size:12.5px;color:var(--ghost);max-width:280px;line-height:1.7;}
+  .foot-cols{display:flex;gap:64px;flex-wrap:wrap;}
+  .foot-col h4{font-size:11px;letter-spacing:0.15em;color:var(--lime-dim);margin-bottom:16px;text-transform:uppercase;}
+  .foot-col a{display:block;font-size:13px;color:var(--ghost);margin-bottom:11px;transition:color .2s;}
+  .foot-col a:hover{color:var(--lime);}
+  .foot-bottom{
+    border-top:1px solid var(--line);
+    padding-top:24px;
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;
+    font-size:11.5px;color:var(--ghost);
+    letter-spacing:0.04em;
+  }
+
+  /* ---------- responsive ---------- */
+  @media (max-width:920px){
+    .nav-links{display:none;}
+    .hero{flex-direction:column;padding-top:140px;text-align:center;}
+    .hero-copy{max-width:100%;}
+    .hero-ctas,.hero-stats{justify-content:center;}
+    .hero-sub,.hero-tag{margin-left:auto;margin-right:auto;}
+    .feat-grid{grid-template-columns:1fr;}
+    .process{grid-template-columns:1fr 1fr;}
+    .token-panel{grid-template-columns:1fr;padding:32px;}
+    .signature{flex-direction:column;}
+    .radar-box{flex:0 0 260px;height:260px;}
+  }
+  @media (max-width:560px){
+    .process{grid-template-columns:1fr;}
+    .hero-stats{flex-direction:column;gap:16px;align-items:center;}
+    .hero-stats div{border-left:none;border-top:1px solid var(--line);padding-left:0;padding-top:10px;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important;}
+  }
+
+  a:focus-visible, button:focus-visible{outline:2px solid var(--lime);outline-offset:2px;}
+</style>
+</head>
+<body>
+
+<div class="bg-grid"></div>
+<div class="bg-vignette"></div>
+
+<header>
+  <nav>
+    <div class="brand">
+      <img src="korvex-logo.png" alt="Korvex logo">
+      <span>KORVEX <span class="tick">$KVX</span></span>
+    </div>
+    <div class="nav-links">
+      <a href="#about">Protocol</a>
+      <a href="#features">Intelligence</a>
+      <a href="#process">How It Works</a>
+      <a href="#token">$KVX</a>
+      <a href="#community">Community</a>
+    </div>
+    <a href="https://app.virtuals.io/virtuals/104723" target="_blank" rel="noopener" class="nav-cta">Launch App</a>
+  </nav>
+</header>
+
+<main>
+  <section class="hero wrap">
+    <div class="hero-copy">
+      <div class="eyebrow"><span class="dot"></span> LIVE ON ROBINHOOD CHAIN</div>
+      <h1>Onchain <span class="accent">Intelligence</span><br>That Never Sleeps.</h1>
+      <p class="hero-sub">Korvex is an autonomous AI intelligence platform engineered for the Robinhood Chain ecosystem — monitoring on-chain activity, interpreting market behavior, and delivering real-time insight before it becomes obvious.</p>
+      <p class="hero-tag">"Terdengar seperti engine berperforma tinggi."</p>
+      <div class="hero-ctas">
+        <a href="https://app.virtuals.io/virtuals/104723" target="_blank" rel="noopener" class="btn-primary">Get $KVX</a>
+        <a href="#features" class="btn-secondary">Explore The Engine</a>
+      </div>
+      <div class="hero-stats">
+        <div><div class="num">24/7</div><div class="lbl">Chain Monitoring</div></div>
+        <div><div class="num">AI-Native</div><div class="lbl">Signal Engine</div></div>
+        <div><div class="num">Robinhood</div><div class="lbl">Chain Ecosystem</div></div>
+      </div>
+    </div>
+    <div class="hero-art">
+      <div class="ring r1"></div>
+      <div class="ring r2"></div>
+      <img src="korvex-logo.png" alt="Korvex mark">
+    </div>
+  </section>
+
+  <div class="marquee">
+    <div class="marquee-track">
+      <span class="hi">ANALYZE.</span><span>PREDICT.</span><span class="hi">DOMINATE.</span>
+      <span>WHALE TRACKING</span><span class="hi">WALLET SCANNING</span><span>TOKEN SCREENING</span>
+      <span class="hi">LIQUIDITY FLOWS</span><span>PREDICTIVE ANALYTICS</span><span class="hi">ROBINHOOD CHAIN</span>
+      <span>ANALYZE.</span><span class="hi">PREDICT.</span><span>DOMINATE.</span>
+      <span class="hi">WHALE TRACKING</span><span>WALLET SCANNING</span><span class="hi">TOKEN SCREENING</span>
+      <span>LIQUIDITY FLOWS</span><span class="hi">PREDICTIVE ANALYTICS</span><span>ROBINHOOD CHAIN</span>
+    </div>
+  </div>
+
+  <section id="about" class="wrap">
+    <div class="section-head">
+      <span class="section-eyebrow">// 01 — THE PROTOCOL</span>
+      <h2>Raw chain data is noise. Korvex turns it into intelligence.</h2>
+      <p>Built to simplify blockchain intelligence, Korvex continuously monitors on-chain activity, interprets complex market behavior, and delivers real-time insight through adaptive artificial intelligence — transforming transactions, liquidity flows, wallet interactions, and ecosystem signals into clear, actionable intelligence.</p>
+    </div>
+
+    <div class="signature">
+      <div class="radar-box">
+        <div class="sweep"></div>
+        <div class="ring r1"></div>
+        <div class="ring r2"></div>
+        <div class="ring r3"></div>
+        <div class="blip" style="top:22%;left:64%;"></div>
+        <div class="blip" style="top:68%;left:30%;"></div>
+        <div class="blip" style="top:40%;left:78%;"></div>
+        <div class="core"></div>
+      </div>
+      <div class="signature-copy">
+        <h3 style="font-size:20px;margin-bottom:16px;">A command center, not a dashboard.</h3>
+        <p>Its continuously evolving AI engine learns from every block, sharpening its ability to detect trends, recognize opportunities, and anticipate market movements before they become obvious. Every pulse on the radar is a signal already interpreted — not a spreadsheet you have to decode yourself.</p>
+        <p>Whether you're a trader, developer, builder, or ecosystem explorer, Korvex acts as your intelligent command center — giving you the tools to navigate Robinhood Chain with confidence.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="features" class="wrap">
+    <div class="section-head">
+      <span class="section-eyebrow">// 02 — THE ENGINE</span>
+      <h2>One AI core. Four ways it watches the chain.</h2>
+      <p>Korvex combines AI, automation, and predictive analytics into one seamless platform — built for the future of decentralized intelligence.</p>
+    </div>
+    <div class="feat-grid">
+      <div class="feat-card">
+        <svg class="feat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <div class="feat-num">MODULE / WHALE-01</div>
+        <h3>Whale Tracking</h3>
+        <p>Follows large wallets in real time, flagging accumulation, distribution, and positioning shifts before they ripple through price.</p>
+      </div>
+      <div class="feat-card">
+        <svg class="feat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="6" width="18" height="13" rx="1"/><path d="M3 10h18M8 14h3"/></svg>
+        <div class="feat-num">MODULE / SCAN-02</div>
+        <h3>Wallet Scanning</h3>
+        <p>Breaks down any address into its holdings, behavior, and history — so you know who you're dealing with before you interact.</p>
+      </div>
+      <div class="feat-card">
+        <svg class="feat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 19V6M10 19V10M16 19V4M22 19H2"/></svg>
+        <div class="feat-num">MODULE / SCREEN-03</div>
+        <h3>Token Screening</h3>
+        <p>Evaluates new and existing tokens on Robinhood Chain for liquidity health, distribution risk, and contract behavior.</p>
+      </div>
+      <div class="feat-card">
+        <svg class="feat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg>
+        <div class="feat-num">MODULE / SIGNAL-04</div>
+        <h3>AI Signals</h3>
+        <p>Continuously learning from every block to surface emerging trends and opportunities — before they're obvious to everyone else.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="process" class="wrap">
+    <div class="section-head">
+      <span class="section-eyebrow">// 03 — HOW IT WORKS</span>
+      <h2>From raw block to actionable call.</h2>
+      <p>A single pipeline, running continuously, turning ecosystem noise into decisions you can act on.</p>
+    </div>
+    <div class="process">
+      <div class="proc-step">
+        <span class="n">01</span>
+        <h3>Ingest</h3>
+        <p>Korvex reads every block on Robinhood Chain — transactions, liquidity moves, wallet activity — as it happens.</p>
+      </div>
+      <div class="proc-step">
+        <span class="n">02</span>
+        <h3>Interpret</h3>
+        <p>The AI engine contextualizes raw activity against historical patterns and live ecosystem behavior.</p>
+      </div>
+      <div class="proc-step">
+        <span class="n">03</span>
+        <h3>Predict</h3>
+        <p>Models trained on evolving on-chain data anticipate movements before they surface on the price chart.</p>
+      </div>
+      <div class="proc-step">
+        <span class="n">04</span>
+        <h3>Deliver</h3>
+        <p>Clear, actionable intelligence lands in your hands — no spreadsheets, no guesswork.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="token" class="wrap">
+    <div class="section-head">
+      <span class="section-eyebrow">// 04 — $KVX</span>
+      <h2>The token that powers the intelligence layer.</h2>
+      <p>$KVX is the native token of Korvex, native to the Robinhood Chain ecosystem and launching through Virtuals Protocol.</p>
+    </div>
+    <div class="token-panel">
+      <div class="token-left">
+        <h3>TOKEN OVERVIEW</h3>
+        <div class="token-row"><span class="k">Name</span><span class="v">Korvex</span></div>
+        <div class="token-row"><span class="k">Ticker</span><span class="v lime">$KVX</span></div>
+        <div class="token-row"><span class="k">Network</span><span class="v">Robinhood Chain</span></div>
+        <div class="token-row"><span class="k">Launchpad</span><span class="v">Virtuals Protocol</span></div>
+        <div class="token-row"><span class="k">Category</span><span class="v">Autonomous AI Agent</span></div>
+        <div class="token-row"><span class="k">Status</span><span class="v lime">Live</span></div>
+      </div>
+      <div class="token-right">
+        <h3>Analyze. Predict. Dominate.</h3>
+        <p>Intelligence drives everything Korvex does. Holding $KVX plugs you directly into the intelligence layer of Robinhood Chain — as the engine that reads, interprets, and predicts the ecosystem.</p>
+        <div class="copy-box">
+          <span id="ca-text">0xef41b040fda3e2407393a318817d994b6896d639</span>
+          <button onclick="navigator.clipboard && navigator.clipboard.writeText(document.getElementById('ca-text').innerText)">COPY</button>
+        </div>
+        <a href="https://app.virtuals.io/virtuals/104723" target="_blank" rel="noopener" class="btn-primary" style="text-align:center;">View On Virtuals</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <div class="cta-band">
+      <h2>Intelligence <span style="color:var(--lime);">drives</span> everything.</h2>
+      <p>Join the Korvex ecosystem and put an AI command center on top of Robinhood Chain.</p>
+      <div class="hero-ctas">
+        <a href="https://app.virtuals.io/virtuals/104723" target="_blank" rel="noopener" class="btn-primary">Get $KVX</a>
+        <a href="#community" class="btn-secondary">Join Community</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer id="community">
+  <div class="wrap">
+    <div class="foot-top">
+      <div class="foot-brand">
+        <div class="brand"><img src="korvex-logo.png" alt="Korvex logo" style="width:28px;height:28px;"><span>KORVEX</span></div>
+        <p>An autonomous AI intelligence platform engineered for the Robinhood Chain ecosystem. Analyze. Predict. Dominate.</p>
+      </div>
+      <div class="foot-cols">
+        <div class="foot-col">
+          <h4>Protocol</h4>
+          <a href="#about">About</a>
+          <a href="#features">Intelligence Engine</a>
+          <a href="#process">How It Works</a>
+        </div>
+        <div class="foot-col">
+          <h4>Token</h4>
+          <a href="#token">$KVX Overview</a>
+          <a href="https://app.virtuals.io/virtuals/104723" target="_blank" rel="noopener">Virtuals Protocol</a>
+          <a href="#">Robinhood Chain</a>
+        </div>
+        <div class="foot-col">
+          <h4>Community</h4>
+          <a href="#">X / Twitter</a>
+          <a href="#">Telegram</a>
+          <a href="#">Docs</a>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Korvex. Built for the future of decentralized intelligence.</span>
+      <span>$KVX — Robinhood Chain</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
